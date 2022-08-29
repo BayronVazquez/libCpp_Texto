@@ -1,18 +1,5 @@
 #include "Texto.h"
 
-/**
- * Funcion: countWord()
- *
- * Descripcion: Esta funcion cuenta el numero de veces que se repite una palabra en la variable text de  esta clase.
- * Busca palabras completas e incomplatas, es decir, si le decimos ue busque 'con' y el texto es 'con esta conexion'
- * el valor devuelto sera 2, ya que en la palabra conexion se encuentra ese patron.
- *
- * Params:
- *      - string palabra
- *          La palabra que se desea buscar en el texto.
- *
- * return: un entero indicando el numero de veces que se encontro la palabra en el texto.
- */
 size_t Texto::countWord(string word)
 {
     size_t count = 0;
@@ -26,17 +13,6 @@ size_t Texto::countWord(string word)
     return count;
 }
 
-/**
- * Funcion: countCharacter()
- *
- * Descripcion: Esta funcion cuenta el numero de veces que se repite una caracter en un texto.
- *
- * Params:
- *      - char character
- *          El caracter que se desea buscar en el texto.
- *
- * return: un entero de tipo size_t indicando el numero de veces que se encontro el caracter en el texto.
- */
 size_t Texto::countCharacter(char character)
 {
     size_t count = 0;
@@ -51,15 +27,80 @@ size_t Texto::countCharacter(char character)
     return count;
 }
 
-bool Texto::isBigEndian(void)
+map<char, size_t> Texto::countAllCharacters()
 {
-    union {
-        uint32_t i;
-        char c[4];
-    } bint = { 0x01020304 };
+    map<char, size_t> listaDeConteo;
+    pair< map<char, size_t>::iterator, bool> valorInsertado;
 
-    return bint.c[0] == 1;
+    // Por cada letra
+    for (size_t i = 0; i < this->text.size(); i++)
+    {
+        // Intentamos insertar la palabra con el valor de 1
+        valorInsertado = listaDeConteo.insert(pair<char, size_t>(this->text[i], 1));
+
+        // si el valor de retorno es falso quiere decir que esa palabra ya existe
+        if (valorInsertado.second == false)
+        {
+            // entonces incrementamos en 1 el contador
+            valorInsertado.first->second++;
+        }
+    }
+
+    return listaDeConteo;
 }
+
+map< string, size_t> Texto::countAllWords()
+{
+    map<string, size_t> listaDeConteo;
+    list<string> listaDePalabras = this->split(' ');
+    pair< map<string, size_t>::iterator, bool> valorInsertado;
+
+    // Por cada palabra en el texto
+    for (auto palabra = listaDePalabras.begin(); palabra != listaDePalabras.end(); palabra++)
+    {
+        // Intentamos insertar la palabra con el valor de 1
+        valorInsertado = listaDeConteo.insert(pair<string, size_t>(*palabra, 1));
+
+        // si el valor de retorno es falso quiere decir que esa palabra ya existe
+        if (valorInsertado.second == false)
+        {
+            // entonces incrementamos en 1 el contador
+            valorInsertado.first->second++;
+        }
+    }
+
+    return listaDeConteo;
+}
+
+list<string> Texto::split(char character)
+{
+    list<string> WordsList;     // lista de string que contiene las palabras separadas por el token especificado como argumento
+    size_t szWordBegin = 0;     // Indice del inicio  de la palabra que se va a agregar en la lista, cambia en cada itineracion
+    size_t szWordEnd = 0;       // Indice del final   de la palabra que se va a agregar en la lista, cambia en cada itineracion
+    size_t szWordSize = 0;      // Tamano de la Palabra a agregar en la lista de palabras, cambia en cada itineracion
+    string sWord;
+
+    while ((szWordEnd = this->text.find(character, szWordBegin)) != string::npos)
+    {
+        szWordSize = szWordEnd - szWordBegin;
+        sWord = this->text.substr(szWordBegin, szWordSize);
+        szWordBegin = szWordEnd + 1;                                   // Actualizamos el indice de donde debe buscar
+        WordsList.push_back(sWord);
+    }
+
+    sWord = this->text.substr(szWordBegin);
+    WordsList.push_back(sWord);
+
+    return WordsList;
+}
+
+
+
+
+
+
+
+
 
 void Texto::detectEnconding() {
     const size_t BIT_8 = 7;
@@ -130,41 +171,6 @@ void Texto::detectEnconding() {
     }
 }
 
-/**
- * Funcion: split()
- *
- * Descripcion: Esta funcion divide el texto de esta clase en una lista de strings, el token que usa para dividirlo, es  pasado
- * como argumento, en caso no encontrar el token retorna todo el texto intacto.
- *
- * Params:
- *      - char character
- *          El caracter que se usara como delimitador para dividir el texto
- *
- * return: una lista de strings 'list<string' con las palabras separadas. En caso de no encontrar el delimitador en el texto se
- * retorna todo el texto intacto.
- */
-list<string> Texto::split(char character)
-{
-    list<string> WordsList;     // lista de string que contiene las palabras separadas por el token especificado como argumento
-    size_t szWordBegin = 0;     // Indice del inicio  de la palabra que se va a agregar en la lista, cambia en cada itineracion
-    size_t szWordEnd = 0;       // Indice del final   de la palabra que se va a agregar en la lista, cambia en cada itineracion
-    size_t szWordSize = 0;      // Tamano de la Palabra a agregar en la lista de palabras, cambia en cada itineracion
-    string sWord;
-
-    while ((szWordEnd = this->text.find(character, szWordBegin)) != string::npos)
-    {
-        szWordSize = szWordEnd - szWordBegin;
-        sWord = this->text.substr(szWordBegin, szWordSize);
-        szWordBegin = szWordEnd + 1;                                   // Actualizamos el indice de donde debe buscar
-        WordsList.push_back(sWord);
-    }
-
-    sWord = this->text.substr(szWordBegin);
-    WordsList.push_back(sWord);
-
-    return WordsList;
-}
-
 vector<long> Texto::getAllNumericStrings()
 {
     vector<long> numeros;
@@ -184,74 +190,6 @@ vector<long> Texto::getAllNumericStrings()
     return numeros;
 }
 
-/**
- * Funcion: countAllWords()
- *
- * Descripcion: Esta funcion cuanta las veces que se repite cada palabra en el texto de la variable de esta clase llamada 'text'
- * , crea un objeto de tipo map donde la clave es la palabra y el valor es el numero de veces que se  repite  en  el texto. Las
- * palabras se determinan por el espacio en blanco.
- *
- * Params: None
- *
- * return: un objeto map donde la clave es la palabra y el valor es el numero  de  veces que se repite. cabe aclarar que map es
- * un contenedor ordenado por lo tanto las palabras estan ordenadas alfabeticamente.
- */
-map< string, size_t> Texto::countAllWords()
-{
-    map<string, size_t> listaDeConteo;
-    list<string> listaDePalabras = this->split(' ');
-    pair< map<string, size_t>::iterator, bool> valorInsertado;
-
-    // Por cada palabra en el texto
-    for (auto palabra = listaDePalabras.begin(); palabra != listaDePalabras.end(); palabra++)
-    {
-        // Intentamos insertar la palabra con el valor de 1
-        valorInsertado = listaDeConteo.insert(pair<string, size_t>(*palabra, 1));
-
-        // si el valor de retorno es falso quiere decir que esa palabra ya existe
-        if (valorInsertado.second == false)
-        {
-            // entonces incrementamos en 1 el contador
-            valorInsertado.first->second++;
-        }
-    }
-
-    return listaDeConteo;
-}
-
-
-/**
- * Funcion: countAllLetters()
- *
- * Descripcion: Esta funcion cuanta las veces que se repite cada letra  en el texto  de la variable de esta clase llamada 'text'
- * , crea un objeto de tipo map donde la clave es la letra y el valor es el numero de veces que se  repite  en  el texto.
- *
- * Params: None
- *
- * return: un objeto map donde la clave es la letra y el valor es el numero  de  veces que se repite. cabe aclarar que map es
- * un contenedor ordenado por lo tanto las letras estan ordenadas alfabeticamente.
- */
-map<char, size_t> Texto::countAllLetters()
-{
-    map<char, size_t> listaDeConteo;
-    pair< map<char, size_t>::iterator, bool> valorInsertado;
-
-    // Por cada letra
-    for (size_t i = 0; i < this->text.size(); i++)
-    {
-        // Intentamos insertar la palabra con el valor de 1
-        valorInsertado = listaDeConteo.insert(pair<char, size_t>(this->text[i], 1));
-
-        // si el valor de retorno es falso quiere decir que esa palabra ya existe
-        if (valorInsertado.second == false)
-        {
-            // entonces incrementamos en 1 el contador
-            valorInsertado.first->second++;
-        }
-    }
-
-    return listaDeConteo;
-}
 
 map<long, size_t> Texto::countAllNumericStrings()
 {
@@ -281,6 +219,15 @@ map<long, size_t> Texto::countAllNumericStrings()
 }
 
 
+bool Texto::isBigEndian()
+{
+    union {
+        uint32_t i;
+        char c[4];
+    } bint = { 0x01020304 };
+
+    return bint.c[0] == 1;
+}
 /**
  *  @brief  Funcion encargada de validar si una cadena es un email valido
  *  @return verdadero si es un email valido de lo contrario retorna falso
@@ -368,10 +315,11 @@ bool Texto::isCURP(string CURP){
         return false;
 
     // 4-9 Contiene la Fecha de Nacimiento
-    for(size_t i = 4; i < 10; ++i){
+    for(size_t i = 4; i <= 9; ++i){
         if( !isdigit( CURP[i]) )
             return false;
     }
+
     return true;
 }
 
