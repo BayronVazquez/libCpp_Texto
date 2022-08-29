@@ -56,18 +56,18 @@ using namespace std;
 class Texto
 {
 public:
-    string text;                                // Es el texto con el cual se estara trabajando
+    string text;
+    size_t countWord(string word);
+    size_t countCharacter(char character);
+    map<char, size_t> countAllCharacters();
+    map<string, size_t> countAllWords();
+    list<string> split(char character);
 
-    size_t countWord(string word);              // cuenta un patron de caracteres (palabra y subpalabara) en el texto
-    size_t countCharacter(char character);      // cuenta cuantas veces se repite un caracter en el texto
-    map<string, size_t> countAllWords();        // cuenta todas las palabras del texto separadas por espacios en blanco
-    map<char, size_t> countAllLetters();        // cuenta todas las letras en el texto
     map<long, size_t> countAllNumericStrings(); // cuanta todas las palabras que representan a un numero entero separadas por espacios en blanco
-    list<string> split(char character);         // Divide el texto por el token dado como parametro
+    // Divide el texto por el token dado como parametro
     vector<long> getAllNumericStrings();         // registra todas las palabras que pueden ser convertidas a un numero entero valido y retorna la lista
     void detectEnconding();
-    bool isBigEndian(void);
-
+    bool isBigEndian();
     bool isEmail( const string email );
     bool isCellPhone( const string cell );
     bool isCURP( const string CURP );
