@@ -94,9 +94,51 @@ list<string> Texto::split(char character)
     return WordsList;
 }
 
+bool Texto::isBigEndian()
+{
+    union {
+        uint32_t i;
+        char c[4];
+    } bint = { 0x01020304 };
 
+    return bint.c[0] == 1;
+}
 
+bool Texto::isEmail( const string email )
+{
+    string dominio;
+    size_t indiceDelArroba = email.find("@");
+    string dominios[] = {
+        "gmail.com",
+        "outlook.com"
+        "hotmail.com"
+        "live.com"
+    };
 
+    // SI CONTIENE EL ARROBA @
+    if( indiceDelArroba != string::npos )
+    {
+        // EXTRAEMOS EL DOMINIO DEL CORREO
+        dominio = email.substr( indiceDelArroba + 1 );
+
+        // VERIFICAMOS SI EL DOMINIO DEL CORREO ESTA EN ALGUN DOMNIO VALIDO
+        for(string dominioValido : dominios)
+        {
+            if( dominioValido.find(dominio) != string::npos )
+                return true;
+        }
+
+        // PENDIENTE VALIDAR LOS ESPACIOS EN BALNCO Y CARACTERES ESPECIALES
+    }
+    else
+    {
+        // NO TIENE ARROBA POR LO TANTO NO ES UN EMAIL VALIDO
+        return false;
+    }
+
+    // SI NO PASA NINGUNA PRUEBA ES UN CORREO INVALIDO
+    return false;
+}
 
 
 
@@ -219,37 +261,6 @@ map<long, size_t> Texto::countAllNumericStrings()
 }
 
 
-bool Texto::isBigEndian()
-{
-    union {
-        uint32_t i;
-        char c[4];
-    } bint = { 0x01020304 };
-
-    return bint.c[0] == 1;
-}
-/**
- *  @brief  Funcion encargada de validar si una cadena es un email valido
- *  @return verdadero si es un email valido de lo contrario retorna falso
- */
-bool Texto::isEmail( const string email )
-{
-    size_t arroba = email.find("@");                // Ubicamos la posicion de @
-    string dominio;
-
-    if( arroba != string::npos ){                   // Si existe @ en el String
-        dominio = email.substr( arroba + 1 );       // extraemos el dominio
-
-        // Pendiente Validar dominios validos
-
-        #ifdef DEBUG
-            cout << "DOMIIO: " << dominio << endl;
-        #endif
-        return true;
-    }else{
-        return false;
-    }
-}
 
 
 /**
